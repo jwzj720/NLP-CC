@@ -4,6 +4,7 @@ import sys
 import argparse
 from tokenizer import tokenize
 import os
+from pathlib import Path
 
 def my_best_segmenter(token_list): 
     """ TODO: Replace this with an improved sentence segmenter. """
@@ -21,14 +22,25 @@ def baseline_segmenter(token_list):
 
 def write_sentence_boundaries(sentence_list, out):
     """ TODO: Write out the token numbers of the sentence boundaries. """
+    total = 0
+    is_first = True
     for sentence in sentence_list:
         #out.write(str(sentence) + "\n")
-        out.write(str(sentence.index(sentence[-1])) + "\n")
+        total += (sentence.index(sentence[-1])) 
+        out.write(str(total) + "\n")
+        if is_first:
+            is_first = False
+        if not is_first:
+            total += 1
+
 
 def main(args):
     #print(len(tokenize(args.textfile.read())))
-    with open('out.txt', 'w') as out_file:
-        print("Baseline segmenter:")
+    file_name = Path(args.textfile.name)
+    full_name = Path(file_name).name.split(".")[0]
+    print(full_name)
+    with open(f"{full_name}.hyp", 'w') as out_file:
+        # print("Tokenize count = " + str(len(tokenize(args.textfile.read()))))
         sentences = baseline_segmenter(tokenize(args.textfile.read(), to_lower=True))
         write_sentence_boundaries(sentences, out_file)
 

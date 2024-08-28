@@ -25,7 +25,7 @@ def is_space(s):
    #print(s)
    return not s.strip() == ""
    
-def tokenize(s, to_lower=False):
+def tokenize(s, to_lower=True):
    split_string = re.split(r'(\W)', s)
    if to_lower:
       split_string = [word.lower() for word in split_string]
