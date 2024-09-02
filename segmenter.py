@@ -3,35 +3,39 @@
 import sys
 import argparse
 from tokenizer import tokenize
-import os
 from pathlib import Path
 
-def my_best_segmenter(token_list): 
-    """ TODO: Replace this with an improved sentence segmenter. """
-    pass
+def my_best_segmenter(token_list):
+    titles = {'dr', 'mr', 'ms', 'mrs', 'prof'}
+    abbrv = {'etc', 'e', 'i', 'cf', 'fig', 'vs', 'viz', 'al', 'p', 'pp', 'no', 'vol', 'rev'}
+    all_sentences = []
+    this_sentence = []
+    prev_token = None
+    for token in token_list:
+        this_sentence.append(token)
+        if token in ['.', ';', '!', '?']:   
+            if prev_token not in titles and prev_token not in abbrv:
+                all_sentences.append(this_sentence)
+                this_sentence = []
+        prev_token = token
+    
+    return all_sentences
 
 def baseline_segmenter(token_list):
     all_sentences = []
     this_sentence = []
     for token in token_list:
         this_sentence.append(token)
-        if token in ['.', ':', ';', '!', '?']:
+        if token in ['.', ';', '!', '?']:
             all_sentences.append(this_sentence)
             this_sentence = []
     return all_sentences
 
 def write_sentence_boundaries(sentence_list, out):
-    """ TODO: Write out the token numbers of the sentence boundaries. """
     total = 0
-    is_first = True
     for sentence in sentence_list:
-        #out.write(str(sentence) + "\n")
-        total += (sentence.index(sentence[-1])) 
-        out.write(str(total) + "\n")
-        if is_first:
-            is_first = False
-        if not is_first:
-            total += 1
+        total += len(sentence)  
+        out.write(str(total - 1) + "\n")  
 
 
 def main(args):
@@ -41,7 +45,7 @@ def main(args):
     print(full_name)
     with open(f"{full_name}.hyp", 'w') as out_file:
         # print("Tokenize count = " + str(len(tokenize(args.textfile.read()))))
-        sentences = baseline_segmenter(tokenize(args.textfile.read(), to_lower=True))
+        sentences = my_best_segmenter(tokenize(args.textfile.read(), to_lower=True))
         write_sentence_boundaries(sentences, out_file)
 
 """You may have opened a file using something like
